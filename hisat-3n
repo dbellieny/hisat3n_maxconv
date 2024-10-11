@@ -61,6 +61,7 @@ my $skip_read_stat = 0;
 my %signo       = ();
 my @signame     = ();
 my $basechange_pair = 'CT';
+my $filtered_reads_count = 0;
 
 # HISAT-3N basechange type
 my %conversion_type = (
@@ -291,6 +292,7 @@ my $temp_dir = "/tmp";
 my $bam_out = 0;
 my $ref_str = undef;
 my $no_pipes = 0;
+my $max_conversions = undef
 my $keep = 0;
 my $verbose = 0;
 my $readpipe = undef;
@@ -310,6 +312,7 @@ GetOptions(
 	"bam"                           => \$bam_out,
 	"no-named-pipes"                => \$no_pipes,
 	"ref-string|reference-string=s" => \$ref_str,
+	"max-conversions=i"             => \$max_conversions,  # New option for maximum conversions
 	"keep"                          => \$keep,
 	"verbose"                       => \$verbose,
 	"log-file=s"                    => \$log_fName
@@ -722,6 +725,16 @@ if(defined($cap_out)) {
 					# Next line is read with some whitespace escaped
 					my $l = <HT>;
 					chomp($l);
+
+					# === Add maximum conversions as a condition to accept reads === dbellieny 10/10/24
+					my ($from, $to) = split('', $basechange_pair);  # Extract the base conversion pair
+					my $conversion_count = () = $l =~ /$from(?=$to)/g;  # Count the number of conversions
+					# If the conversion count exceeds the allowed max, filter out the read
+					if (defined($max_conversions) && $conversion_count > $max_conversions) {
+						$filtered_reads_count++;
+						next;  # Skip this read
+					}
+
 					$l =~ s/%(..)/chr(hex($1))/eg;
 					if((defined($read_fhs{un}) || defined($read_fhs{al})) && $unp && !$secondary) {
 						if($unal) {
@@ -758,6 +771,7 @@ if(defined($cap_out)) {
 	for my $k (@fhs_to_close) { close($k); }
 	close($ofh);
 	close(HT);
+	Info("$filtered_reads_count reads filtered due to exceeding the maximum conversion threshold\n") if $filtered_reads_count > 0;
 	$ret = $?;
 } else {
 	$ret = system($cmd);

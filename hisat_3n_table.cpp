@@ -32,6 +32,7 @@ bool uniqueOnly = false;
 bool multipleOnly = false;
 bool CG_only = false;
 int nThreads = 1;
+int maxConversions;
 long long int loadingBlockSize = 1000000;
 char convertFrom = '0';
 char convertTo = '0';
@@ -136,6 +137,9 @@ static void parseOption(int next_option, const char *optarg) {
             CG_only = true;
             break;
         }
+        case 't':  // Assuming you want to use -c or similar for max-conversions
+            maxConversions = atoi(optarg);
+            break;
         case 'h': {
             printHelp(cerr);
             throw 0;

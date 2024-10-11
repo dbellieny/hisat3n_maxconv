@@ -2,11 +2,10 @@
 
 ## Install HISAT-3N with max-conversions option
 
-      git clone https://github.com/Doudna-lab/hisat3n_maxconv.git hisat-3n
-      cd hisat-3n
-      git checkout -b hisat-3n origin/hisat-3n
-      make
-
+        git clone https://github.com/dbellieny/hisat3n_maxconv.git hisat-3n
+        cd hisat-3n
+        git checkout -b hisat-3n origin/hisat-3n
+        make
 # HISAT2
 
 ## Contact

@@ -936,6 +936,7 @@ static void printUsage(ostream& out) {
         << "  --directional-mapping       make directional mapping, please use this option only if your reads are prepared with a strand specific library (off)" << endl
         << "  --repeat-limit <int>        maximum number of repeat will be expanded for repeat alignment (1000)" << endl
         << "  --unique-only               only output the reads have unique alignment (off)" << endl
+        << "  -t/--max-conversions <int>  include only reads with up to N conversions." << endl
 		<< endl
         << " Spliced Alignment:" << endl
         << "  --pen-cansplice <int>              penalty for a canonical splice site (0)" << endl

@@ -83,6 +83,7 @@ static void printHelp(ostream& out) {
         << " Input:" << endl
         << "  -u/--unique-only          only count the base which is in unique mapped reads." << endl
         << "  -m/--multiple-only        only count the base which is in multiple mapped reads." << endl
+        << "  -t/--max-conversions      include only reads with up to N conversions." << endl
         << "  -c/--CG-only              only count CG and ignore CH in reference." << endl
         << "  --added-chrname           please add this option if you use --add-chrname during HISAT-3N alignment." << endl
         << "  --removed-chrname         please add this option if you use --remove-chrname during HISAT-3N alignment." << endl

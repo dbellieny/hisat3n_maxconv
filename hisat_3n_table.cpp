@@ -32,7 +32,7 @@ bool uniqueOnly = false;
 bool multipleOnly = false;
 bool CG_only = false;
 int nThreads = 1;
-int maxConversions;
+int maxConversions = -1;  // -1 indicates no limit unless specified
 long long int loadingBlockSize = 1000000;
 char convertFrom = '0';
 char convertTo = '0';
@@ -63,6 +63,7 @@ static struct option long_options[] {
                 {"unique-only", no_argument, 0, 'u'},
                 {"multiple-only", no_argument, 0, 'm'},
                 {"CG-only", no_argument, 0, 'c'},
+                {"max-conversions", required_argument, 0, 't'},  // Add this line for max-conversions option
                 {"threads", required_argument, 0, 'p'},
                 {"added-chrname", no_argument, 0, ARG_ADDED_CHRNAME },
                 {"removed-chrname", no_argument, 0, ARG_REMOVED_CHRNAME },
@@ -137,9 +138,10 @@ static void parseOption(int next_option, const char *optarg) {
             CG_only = true;
             break;
         }
-        case 't':  // Assuming you want to use -c or similar for max-conversions
+        case 't':  {
             maxConversions = atoi(optarg);
             break;
+        }
         case 'h': {
             printHelp(cerr);
             throw 0;
@@ -295,6 +297,22 @@ int hisat_3n_table()
             positions->returnLine(line);
             continue;
         }
+
+        int conversionCount = 0;  // Reset conversion count for each line
+        size_t pos = line->find(convertFrom);
+        while (pos != std::string::npos) {
+            if ((*line)[pos + 1] == convertTo) {  // Check if conversion match is found
+                conversionCount++;
+            }
+            pos = line->find(convertFrom, pos + 1);
+        }
+
+        // Skip the read if conversionCount exceeds maxConversions
+        if (maxConversions != -1 && conversionCount > maxConversions) {
+            positions->returnLine(line);
+            continue;  // Go to the next SAM line
+        }
+
         // if the samChromosome is different than current positions' chromosome, finish all SAM line.
         // then load a new reference chromosome.
         if (samChromosome != positions->chromosome) {

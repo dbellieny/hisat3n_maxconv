@@ -169,6 +169,13 @@ for my $i (0..$#ht2_args) {
 for(my $i = 0; $i < scalar(@ht2_args); $i++) {
 	next unless defined($ht2_args[$i]);
 	my $arg = $ht2_args[$i];
+
+	# Filter out --max-conversions so it doesn't get passed to hisat2-align
+    if ($arg eq "--max-conversions") {
+        $i++;  # Skip the next element as well since it's the value
+        next;
+    }
+
 	my @args = split(/=/, $arg);
 	if(scalar(@args) > 2) {
 		$args[1] = join("=", @args[1..$#args]);

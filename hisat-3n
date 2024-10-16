@@ -139,13 +139,22 @@ my @orig_argv = @ARGV;
 my @ht2w_args = (); # options for wrapper
 my @ht2_args  = (); # options for HISAT
 my $saw_dd = 0;
-for(0..$#ARGV) {
-	if($ARGV[$_] eq "--") {
-		$saw_dd = 1;
-		next;
-	}
-	push @ht2w_args, $ARGV[$_] if !$saw_dd;
-	push @ht2_args,  $ARGV[$_] if  $saw_dd;
+for (my $i = 0; $i < scalar(@ARGV); $i++) {
+
+	if ($ARGV[$i] eq "--max-conversions") {
+        # Capture --max-conversions for the wrapper, skip next argument (its value)
+        push @ht2w_args, $ARGV[$i], $ARGV[$i+1];
+        $i++;  # Skip the value
+        next;
+    }
+
+	if($ARGV[$i] eq "--") {
+        $saw_dd = 1;
+        next;
+    }
+
+	push @ht2w_args, $ARGV[$_] if !defined $saw_dd;
+	push @ht2_args,  $ARGV[$_] if defined $saw_dd;
 }
 if(!$saw_dd) {
 	@ht2_args = @ht2w_args;

@@ -153,8 +153,8 @@ for (my $i = 0; $i < scalar(@ARGV); $i++) {
         next;
     }
 
-	push @ht2w_args, $ARGV[$i] if !defined $saw_dd;
-    push @ht2_args,  $ARGV[$i] if defined $saw_dd;
+	push @ht2w_args, $ARGV[$i] if !$saw_dd;
+    push @ht2_args,  $ARGV[$i] if $saw_dd;
 }
 if(!$saw_dd) {
 	@ht2_args = @ht2w_args;

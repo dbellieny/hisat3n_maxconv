@@ -142,19 +142,25 @@ my $saw_dd = 0;
 for (my $i = 0; $i < scalar(@ARGV); $i++) {
 
 	if ($ARGV[$i] eq "--max-conversions") {
-        # Capture --max-conversions for the wrapper, skip next argument (its value)
-        push @ht2w_args, $ARGV[$i], $ARGV[$i+1];
-        $i++;  # Skip the value
-        next;
-    }
+		# Capture --max-conversions for the wrapper, skip next argument (its value)
+		push @ht2w_args, $ARGV[$i], $ARGV[$i+1];
+		$i++;  # Skip the value
+		next;
+}
 
 	if($ARGV[$i] eq "--") {
-        $saw_dd = 1;
-        next;
+		$saw_dd = 1;
+		next;
     }
 
+	# Explicitly filter out --max-conversions before constructing the command
+	@ht2_args = grep { $i ne "--max-conversions" } @ht2_args;
+
+	print "Arguments for hisat2-align: @ht2_args\n";
+	print "Wrapper-specific arguments: @ht2w_args\n";
+
 	push @ht2w_args, $ARGV[$i] if !$saw_dd;
-    push @ht2_args,  $ARGV[$i] if $saw_dd;
+	push @ht2_args,  $ARGV[$i] if $saw_dd;
 }
 if(!$saw_dd) {
 	@ht2_args = @ht2w_args;
@@ -651,7 +657,8 @@ else {
 my $debug_str = ($debug ? "-debug" : "");
 push @ht2_args, "--3N";
 # Construct command invoking hisat2-align
-my $cmd = "'$align_prog$debug_str' --wrapper basic-0 ".join(" ", @ht2_args);
+my $cmd = "'$align_prog$debug_str' --wrapper basic-0 " . join(" ", @ht2_args);
+
 
 # Possibly add read input on an anonymous pipe
 $cmd = "$readpipe $cmd" if defined($readpipe);
